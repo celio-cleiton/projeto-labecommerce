@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "ecommerce",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "test": "testdev",
-    "start": "clear && node ./index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node ./build/index.js"
   },
   "repository": {
     "type": "git",
@@ -17,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/celio-cleiton/projeto-labecommerce/issues"
   },
-  "homepage": "https://github.com/celio-cleiton/projeto-labecommerce#readme"
+  "homepage": "https://github.com/celio-cleiton/projeto-labecommerce#readme",
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "typescript": "^5.0.4"
+  }
 }
