@@ -1,0 +1,21 @@
+{
+  "name": "labecommerce-backend",
+  "version": "1.0.0",
+  "description": "ecommerce",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "testdev",
+    "start": "clear && node ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/celio-cleiton/labecommerce-backend.git"
+  },
+  "author": "Célio Cleiton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/celio-cleiton/projeto-labecommerce/issues"
+  },
+  "homepage": "https://github.com/celio-cleiton/projeto-labecommerce#readme"
+}
