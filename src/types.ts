@@ -20,15 +20,8 @@ export type User = {
     totalPrice:number
   }
 
-  export enum PET_SIZE {
-    SMALL = "Pequeno porte",
-    MEDIUM = "Médio porte",
-    LARGE = "Grande porte"
-  }
-  
-  export type TPet = {
-    id: string,
-    name: string,
-    age: number,
-    size: PET_SIZE
+  export enum Category {
+    ELETRONIC = "produtos eletronicos",
+    CARS = "carros",
+    MOTO = "moto"
   }
