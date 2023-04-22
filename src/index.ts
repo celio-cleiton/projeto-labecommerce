@@ -1,6 +1,7 @@
 import { users, products, purchases } from "./database";
 import express, { Request, Response } from 'express'
 import { Product, Purchase } from "./types";
+import { db } from './database/knex';
 import cors from 'cors';
 
 
@@ -41,9 +42,44 @@ app.get('/ping', (req: Request, res: Response) => {
 // config do app express aqui (referencie o material async)
 
 // endpoint GET com query q
-app.get('/users', (req: Request, res: Response) => {
-    res.status(200).send(users)
+// app.get('/users', (req: Request, res: Response) => {
+//     res.status(200).send(users)
+// })
+
+app.get('/users', async (req: Request, res: Response) => {
+  try {
+      const result = await db.raw('SELECT * FROM users;')
+      res.status(200).send(result)
+  } catch (error: any) {
+      res.status(400).send(error.message)
+  }
 })
+
+
+// endpoint do tipo POST
+app.post('/users', async (req: Request, res: Response) => {
+  try {
+      const id: string = Math.floor(Date.now() * Math.random()).toString(36)
+      const {name, email, password } = req.body
+      if (typeof name !== "string" || typeof email !== "string") {
+          return res.status(400).send("'nome'e 'email' deve ser tipo string")
+      }
+      const [invalidUser] = await db.raw(`SELECT * FROM users WHERE id = "${id}";`)
+      if (invalidUser) {
+          res.status(400)
+          throw new Error("Este ID já esta cadastrado")
+      }
+      const [invalidEmail] = await db.raw(`SELECT * FROM users WHERE email = "${email}";`)
+      if (invalidEmail) {
+          res.status(400)
+          throw new Error("Este email já esta cadastrado")
+      }
+      const newEntry = await db.raw(`INSERT INTO users (id, name, email, password) VALUES ("${id}", "${name}","${email}", "${password}")`) 
+      res.status(201).send("Cadastro realizado com sucesso")
+  } catch (error: any) {
+      res.send(error.message)
+  }
+});
 
 app.get('/users/:id', (req: Request, res: Response) => {
     try {
@@ -115,6 +151,8 @@ app.get('/users/:id', (req: Request, res: Response) => {
     }
 });
 
+//fim do Users
+
 
 app.get('/products', (req: Request, res: Response) => {
     res.status(200).send(products)
@@ -129,24 +167,45 @@ app.get('/products/search', (req: Request, res: Response) => {
     res.status(200).send(result)
 })
 
-app.post('/products', (req: Request, res: Response) => {
-    // forçamos novamente a tipagem
-    const id = req.body.id as string
-    const name = req.body.name as string
-    const price = req.body.price as number
-    const category = req.body.category as string
+//endpoint do tipo POST
+app.post('/products', async (req: Request, res: Response) => {
+  try {
+      const id: string = Math.floor(Date.now() * Math.random()).toString(36)        
+      const { name, price, description, imageUrl } = req.body
+      if (typeof name !== "string" || typeof price !== "number" || typeof description !== "string" ||typeof imageUrl !== "string" ) {
+          res.status(400)
+          throw new Error("'id','nome'e 'description' deve ser tipo string e price do tipo number");
+      }
+      const [invalidProductId] = await db.raw(`SELECT * FROM products WHERE id = "${id}";`)
+      if (invalidProductId) {
+          res.status(400)
+          throw new Error("Este ID já possui um produto")
+      }
+      const newEntry = await db.raw(`INSERT INTO products (id, name, price, description, image_url) VALUES ("${id}", "${name}","${price}", "${description}", "${imageUrl}")`) 
+      res.status(201).send("Produto cadastrado com sucesso")
+  } catch (error: any) {
+      res.send(error.message)
+  }
 
-    const newProducts: Product = {
-        id,
-        name,
-        price,
-        category,
-    }
+});
+// app.post('/products', (req: Request, res: Response) => {
+//     // forçamos novamente a tipagem
+//     const id = req.body.id as string
+//     const name = req.body.name as string
+//     const price = req.body.price as number
+//     const category = req.body.category as string
 
-    products.push(newProducts)
+//     const newProducts: Product = {
+//         id,
+//         name,
+//         price,
+//         category,
+//     }
 
-    res.status(201).send("Cadastro realizado com sucesso")
-})
+//     products.push(newProducts)
+
+//     res.status(201).send("Cadastro realizado com sucesso")
+// })
 
 app.get('/products/:id', (req: Request, res: Response) => {
 	const id = req.params.id // não precisamos forçar a tipagem aqui, porque todo path params é string
@@ -218,25 +277,44 @@ app.delete('/products/:id', (req: Request, res: Response) => {
     }
 });
 
+//fim do Product
 
-app.post('/purchases', (req: Request, res: Response) => {
-    // forçamos novamente a tipagem
-    const userId = req.body.userId as string
-    const productId = req.body.productId as string
-    const quantity = req.body.quantity as number
-    const totalPrice = req.body.totalPrice as number
+app.post('/purchases', async (req: Request, res: Response) => {
+  try {
+      const id: string = Math.floor(Date.now() * Math.random()).toString(36) 
+      const { buyer, totalPrice } = req.body
+      if (typeof buyer !== "string" || typeof totalPrice!== "number") {
+          res.status(400)
+          throw new Error("passe um id de usuario ou valor toal e compra válidos")
+      }
+      const [userExists] = await db.raw(`SELECT * FROM users WHERE id = "${buyer}";`)
+      if (!userExists) {
+          throw new Error("Usuário não encontrado")
+      }
+      const newEntry = await db.raw(`INSERT INTO purchases (id,buyer, total_price) VALUES ("${id}", "${buyer}","${totalPrice}")`)
+      res.status(201).send("Compra cadastrada com sucesso")
+  } catch (error: any) {
+      res.send(error.message)
+  }
+});
+// app.post('/purchases', (req: Request, res: Response) => {
+//     // forçamos novamente a tipagem
+//     const userId = req.body.userId as string
+//     const productId = req.body.productId as string
+//     const quantity = req.body.quantity as number
+//     const totalPrice = req.body.totalPrice as number
 
-    const newPurchases: Purchase = {
-        userId,
-        productId,
-        quantity,
-        totalPrice
-    }
+//     const newPurchases: Purchase = {
+//         userId,
+//         productId,
+//         quantity,
+//         totalPrice
+//     }
 
-    purchases.push(newPurchases)
+//     purchases.push(newPurchases)
 
-    res.status(201).send("Compra realizado com sucesso")
-})
+//     res.status(201).send("Compra realizado com sucesso")
+// })
 
 app.get('/purchases', (req: Request, res: Response) => {
     res.status(200).send(purchases)
