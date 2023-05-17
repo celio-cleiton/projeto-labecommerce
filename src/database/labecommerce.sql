@@ -1,22 +1,13 @@
+-- Active: 1684199183866@@127.0.0.1@3306
+
 CREATE TABLE
     users (
         id TEXT PRIMARY KEY UNIQUE NOT NULL,
         name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime'))
     );
-
--- INSERT INTO users (id, email, password)
-
--- VALUES
-
--- ("u01", "roberto@gmail.com", "12345"),
-
--- ("u02", "carlos@gmail.com", "123456"),
-
--- ("u03", "robertocarlos@email.com", "1234567"),
-
--- ("u04", "celiocleiton@email.com", "654321");;
 
 DROP TABLE users;
 
@@ -25,10 +16,56 @@ CREATE TABLE
         id TEXT PRIMARY KEY UNIQUE NOT NULL,
         name TEXT NOT NULL,
         price REAL NOT NULL,
-        category TEXT NOT NULL,
         description TEXT NOT NULL,
-        image_url TEXT NOT NULL
+        category TEXT NOT NULL,
+        imageUrl TEXT NOT NULL
     );
+
+DROP TABLE products;
+
+CREATE TABLE
+    purchases (
+        id TEXT PRIMARY KEY UNIQUE NOT NULL,
+        buyer TEXT NOT NULL,
+        total_price REAL NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
+        paid INTEGER NOT NULL DEFAULT (0),
+        FOREIGN KEY (buyer) REFERENCES users(id)
+    );
+
+DROP TABLE purchases;
+
+CREATE TABLE
+    purchases_products(
+        purchase_id TEXT NOT NULL,
+        product_id TEXT NOT NULL,
+        quantity INTEGER NOT NULL DEFAULT (1),
+        FOREIGN KEY (purchase_id) REFERENCES purchases (id),
+        FOREIGN KEY (product_id) REFERENCES products (id)
+    );
+
+DROP TABLE purchases_products;
+
+INSERT INTO
+    users (id, name, email, password)
+VALUES (
+        "u001",
+        "Roberto",
+        "roberto@email.com",
+        "rc12345"
+    ), (
+        "u002",
+        "Carlos",
+        "carlos@email.com",
+        "cr123456"
+    ), (
+        "u003",
+        "Celio",
+        "celio@email.com",
+        "cc1234567"
+    );
+
+SELECT * FROM users;
 
 INSERT INTO
     products (
@@ -37,220 +74,76 @@ INSERT INTO
         price,
         category,
         description,
-        image_url
+        imageUrl
     )
 VALUES (
-        "p01",
-        "SmartPhone",
-        2800,
-        "Eletronic",
-        "smartphone.png"
+        "p001",
+        "tv",
+        5800,
+        "eletronico",
+        "descrição",
+        "tv.png"
     ), (
-        "p02",
-        "TV Smart",
-        5500,
-        "Eletronic",
-        "tvsmart.png"
+        "p002",
+        "smartTv",
+        4500,
+        "eletronico",
+        "descrição",
+        "smartTv.png"
     ), (
-        "p03",
-        "Pc Gamer",
-        4100,
-        "Eletronic",
-        "pcgamer.png"
+        "p003",
+        "smartPhone",
+        1000,
+        "eletronico",
+        "descrição",
+        "smartPhone.png"
     ), (
-        "p04",
-        "HD",
-        500,
-        "Eletronic",
-        "hd.png"
+        "p004",
+        "monitor",
+        1400,
+        "eletronico",
+        "descrição",
+        "monitor.png"
     ), (
-        "p05",
-        "Memoria Ram",
-        150,
-        "Eletronic",
-        "memoriaram.png"
+        "p005",
+        "gabinete",
+        200,
+        "eletronico",
+        "descrição",
+        "gabinete.png"
     );
 
 SELECT * FROM products;
 
-DROP TABLE products;
+INSERT INTO users (id,name, email, password)
+VALUES
+("u004", "Cleiton", "cleiton@email.com", "c12345678");
 
--- Get All Users
+INSERT INTO products (id, name, price, category, description, imageUrl)
+VALUES
+("p006", "iphone", 7500, "eletronico","descrição", "iphone.png");
 
--- retorna todos os usuários cadastrados
-
-SELECT * FROM users;
-
--- Get All Products
-
--- retorna todos os produtos cadastrados
-
-SELECT * FROM products;
-
--- Search Product by name
-
--- crie um termo de busca, por exemplo " monitor "
-
--- retorna o resultado baseado no termo de busca
-
-SELECT * FROM products where name=" NoteBook ";
-
--- Create User
-
--- crie um novo usuário
-
--- insere o item mockado na tabela users
-
-INSERT INTO
-    users (id, name, email, password)
-VALUES (
-        " u01 ",
-        " Roberto Carols ",
-        " robertocarlos @email.com ",
-        " 12345 "
-    ), (
-        " u02 ",
-        " Marcus Rodrigues ",
-        " marcus @email.com ",
-        " 123456 "
-    ), (
-        " u03 ",
-        " Celio Cleiton ",
-        " celiocleiton @email.com ",
-        " 1234567 "
-    ), (
-        " u04 ",
-        " Cleiton Rodrigues ",
-        " cleiton @email.com ",
-        " 12345678 "
-    );
-
-SELECT * FROM users;
-
--- Get All Users
-
--- Create Product
-
--- crie um novo produto
-
--- insere o item mockado na tabela products
-
-INSERT INTO
-    products (id, name, price, category)
-VALUES (
-        " p05 ",
-        " Iphone ",
-        3700,
-        " Eletronic "
-    );
-
--- Get All Users
-
--- retorna o resultado ordenado pela coluna email em ordem crescente
-
-SELECT *FROM users ORDER BY email ASC;
-
--- Get All Products versão 1
-
--- retorna o resultado ordenado pela coluna price em ordem crescente
-
--- limite o resultado em 20 iniciando pelo primeiro item
-
-SELECT * FROM products ORDER BY price ASC LIMIT 20 OFFSET 0;
-
--- Get All Products versão 2
-
--- seleção de um intervalo de preços, por exemplo entre 100.00 e 300.00
-
--- retorna os produtos com preços dentro do intervalo definido em ordem crescente
-
-select *
-from products
-WHERE
-    price BETWEEN 300.00 and 500.00
-ORDER BY price ASC;
-
-CREATE TABLE
-    purchases (
-        id TEXT PRIMARY KEY UNIQUE NOT NULL,
-        total_price REAL NOT NULL,
-        paid INTEGER NOT NULL,
-        delivered_at TEXT,
-        buyer_id TEXT NOT NULL,
-        FOREIGN KEY (buyer_id) REFERENCES users(id)
-    );
-
---   A coluna paid será utilizada para guardar uma lógica booleana. O SQLite recomenda o uso do número 0 para false e 1 para true.
-
--- Os pedidos começam com paid valendo 0 (você irá definir isso quando for popular a tabela com o INSERT).
-
--- A coluna delivered_at será utilizada para gerenciar a data de entrega do pedido. Ela é opcional, porque sempre começará sem valor ao criar um pedido, ou seja, null.
-
--- O SQLite recomenda utilizar TEXT para lidar com strings no formato ISO8601 " aaaa - mm - dd hh: mm: sss ". Lembre-se da existência da função nativa DATETIME para gerar datas nesse formato.
-
--- a) Crie dois pedidos para cada usuário cadastrado
-
--- No mínimo 4 no total (ou seja, pelo menos 2 usuários diferentes) e devem iniciar com a data de entrega nula.
-
-DROP TABLE purchases;
-
-INSERT INTO
-    purchases (id, total_price, paid, buyer_id)
-VALUES (" c01 ", 82, 0, " u01 "), (" c02 ", 125, 0, " u02 "), (" c03 ", 96, 0, " u03 "), (" c04 ", 43, 0, " u04 ");
-
-INSERT INTO
-    purchases (id, total_price, paid, buyer_id)
-VALUES (" c05 ", 15, 0, " u01 "), (" c06 ", 56, 0, " u02 ");
-
--- Edite o status da data de entrega de um pedido
-
--- Simule que o pedido foi entregue no exato momento da sua edição (ou seja, data atual).
-
-UPDATE purchases
-SET
-    delivered_at = datetime('now', 'localtime')
-WHERE id = " c01 ";
-
-UPDATE purchases
-SET
-    delivered_at = datetime('now', 'localtime')
-WHERE id IN(" c03 ", " c04 ");
+INSERT INTO purchases (id, buyer, total_price)
+VALUES
+("c001","u002", 3000),
+("c002", "u002", 5600),
+("c003", "u001", 200),
+("c004", "u004", 0);
 
 SELECT * FROM purchases;
-
--- Exercício 3
-
--- Crie a query de consulta utilizando junção para simular um endpoint de histórico de compras de um determinado usuário.
-
--- Mocke um valor para a id do comprador, ela deve ser uma das que foram utilizadas no exercício 2.
-
-SELECT *
-FROM users
-    INNER JOIN purchases ON users.id = purchases.buyer_id
-WHERE users.id = " u02 ";
-
-CREATE TABLE
-    purchases_products(
-        purchase_id TEXT NOT NULL,
-        product_id TEXT NOT NULL,
-        quantity INTEGER NOT NULL,
-        FOREIGN KEY (purchase_id) REFERENCES purchases (id),
-        FOREIGN KEY (product_id) REFERENCES products (id)
-    );
-
-INSERT INTO
-    purchases_products(
-        purchase_id,
-        product_id,
-        quantity
-    )
-VALUES ('c01', 'p03', 1), ('c01', 'p04', 1), ('c02', 'p02', 2), ('c02', 'p05', 1);
-
+SELECT * FROM users
+INNER JOIN purchases
+ON users.id=purchases.buyer
+WHERE users.id="u002";
+INSERT INTO purchases_products(purchase_id, product_id, quantity)
+VALUES
+('c001','p003',3),
+('c001','p004',1),
+('c002','p002',4),
+('c003','p005',1);
 SELECT * FROM purchases_products;
-
-DROP TABLE purchases_products;
-
-SELECT *
-FROM purchases_products
-    INNER JOIN purchases ON purchases_products.purchase_id = purchases.id
-    INNER JOIN products ON purchases_products.product_id = products.id;
+SELECT * FROM purchases_products
+INNER JOIN purchases
+ON purchases_products.purchase_id = purchases.id
+INNER JOIN products
+ON purchases_products.product_id = products.id;
