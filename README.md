@@ -1,97 +1,84 @@
-# Projeto labecommerce
+# Projeto LabEcommerce
 
-É o primeiro projeto do back-end, onde praticamos toda a base de criação de uma API vinculada a um banco de dados real.<br>
-Ele tem uma particularidade: seus requisitos são implementados ao longo dos exercícios pós aula. Isso significa que caso você siga o desenvolvimento das aulas, quando chegar na data de entrega já terá um projeto funcional e quase pronto para entrega.
+O Projeto LabEcommerce é o primeiro projeto do curso de back-end, onde praticamos a criação de uma API vinculada a um banco de dados real. O projeto tem a particularidade de ter seus requisitos implementados ao longo dos exercícios pós-aula. Isso significa que, ao acompanhar o desenvolvimento das aulas, você terá um projeto funcional e quase pronto para entrega quando chegar a data de entrega.
 
 ## Conteúdos abordados
 
 - NodeJS
 - Typescript
 - Express
-- SQL e SQLite
+- SQLite
 - Knex
 - Postman
+- Banco de dados
 
-# Banco de dados
-![image](https://user-images.githubusercontent.com/29845719/214396608-ddcfd097-e615-44f9-acbe-f815f9abb83f.png)
-https://dbdiagram.io/d/63c6e8e5296d97641d7a4666
+## Requisitos
 
-# Lista de requisitos
+### Endpoints
 
-- Endpoints
+- **Get all users**: Retorna todas as pessoas cadastradas.
+- **Create user**: Cadastra uma nova pessoa.
+- **Create product**: Cadastra um novo produto.
+- **Get all products funcionalidade 1**: Retorna todos os produtos cadastrados.
+- **Get all products funcionalidade 2**: Retorna os produtos filtrados por nome.
+- **Edit product by id**: Edita um produto existente.
+- **Create purchase**: Cadastra um novo pedido.
+- **Delete purchase by id**: Deleta um pedido existente.
+- **Get purchase by id**: Retorna os dados de uma compra, incluindo a lista de produtos.
 
-    - [ ]  Get all users
-    - [ ]  Create user
-    - [ ]  Create product
-    - [ ]  Get all products funcionalidade 1
-    - [ ]  Get all products funcionalidade 2
-    - [ ]  Edit product by id
-    - [ ]  Create purchase
-    - [ ]  Delete purchase by id
-    - [ ]  Get purchase by id
+### Documentação Postman
 
-- Documentação Postman
+O arquivo de documentação do Postman deve conter os exemplos de requisição e resposta para cada endpoint.
 
-- README.md
+## Exemplos de requisição
 
-# Exemplos de requisição
-Não precisa cadastrar o mesmo nome, email e quaisquer outros valores vistos aqui nos exemplos de saída. Porém, lembre-se de respeitar a estrutura pedida no banco de dados (nome das tabelas e colunas) e os nomes das propriedades na resposta da API.
+**Get all users**
 
-Colunas a mais na tabela não tem problema, por exemplo adicionar uma 'category' dentro da tabela 'products', mas a falta de uma coluna ou propriedade na resposta será considerada falha de implementação!
+```http
+GET /users
+```
 
-## Get all users
-Retorna todas as pessoas cadastradas.<br>
-Dica: atenção com o nome da propriedade createdAt! Ela deve vir em camelCase, apesar de estar em snake_case no banco de dados.
-```typescript
-// Request
-// GET /users
-
-// Response
-// status 200 OK
+```json
 [
     {
-        id: "u001",
-        name: "Fulano",
-        email: "fulano@email.com",
-        password: "fulano123",
-        createdAt: "2023-01-15 09:12:42"
+        "id": "u001",
+        "name": "Fulano",
+        "email": "fulano@example.com",
+        "password": "fulano123",
+        "createdAt": "2023-01-15 09:12:42"
     },
     {
-        id: "u002",
-        name: "Ciclana",
-        email: "ciclana@email.com",
-        password: "ciclana99",
-        createdAt: "2023-01-17 12:35:28"
+        "id": "u002",
+        "name": "Ciclana",
+        "email": "ciclana@example.com",
+        "password": "ciclana99",
+        "createdAt": "2023-01-17 12:35:28"
     }
 ]
 ```
 
-## Create user
-Cadastra uma nova pessoa.
-```typescript
-// Request
-// POST /users
-// body JSON
+**Create user**
+
+```http
+POST /users
+```
+
+```json
 {
     "id": "u003",
     "name": "Astrodev",
-    "email": "astrodev@email.com",
+    "email": "astrodev@example.com",
     "password": "astrodev00"
-}
-
-// Response
-// status 201 CREATED
-{
-    message: "Cadastro realizado com sucesso"
 }
 ```
 
-## Create product
-Cadastra um novo produto.
-```typescript
-// Request
-// POST /products
-// body JSON
+**Create product**
+
+```http
+POST /products
+```
+
+```json
 {
     "id": "prod003",
     "name": "Teclado gamer",
@@ -99,82 +86,72 @@ Cadastra um novo produto.
     "description": "Teclado mecânico com numpad",
     "imageUrl": "https://picsum.photos/seed/Teclado%20gamer/400"
 }
-
-// Response
-// status 201 CREATED
-{
-    message: "Produto cadastrado com sucesso"
-}
 ```
 
-## Get all products funcionalidade 1
-Retorna todos os produtos cadastrados.
-```typescript
-// Request
-// GET /products
+**Get all products funcionalidade 1**
 
-// Response
-// status 200 OK
+```http
+GET /products
+```
+
+```json
 [
     {
-        id: "prod001",
-        name: "Mouse gamer",
-        price: 250,
-        description: "Melhor mouse do mercado!",
-        imageUrl: "https://picsum.photos/seed/Mouse%20gamer/400"
+        "id": "prod001",
+        "name": "Mouse gamer",
+        "price": 250,
+        "description": "Melhor mouse do mercado!",
+        "imageUrl": "https://picsum.photos/seed/Mouse%20gamer/400"
     },
     {
-        id: "prod002",
-        name: "Monitor",
-        price: 900,
-        description: "Monitor LED Full HD 24 polegadas",
-        imageUrl: "https://picsum.photos/seed/Monitor/400"
+        "id": "prod002",
+        "name": "Monitor",
+        "price": 900,
+        "description": "Monitor LED Full HD 24 polegadas",
+        "imageUrl": "https://picsum.photos/seed/Monitor/400"
     },
     {
-        id: "prod003",
-        name: "Teclado gamer",
-        price: 200,
-        description: "Teclado mecânico com numpad",
-        imageUrl: "https://picsum.photos/seed/Teclado%20gamer/400"
+        "id": "prod003",
+        "name": "Teclado gamer",
+        "price": 200,
+        "description": "Teclado mecânico com numpad",
+        "imageUrl": "https://picsum.photos/seed/Teclado%20gamer/400"
     }
 ]
 ```
 
-## Get all products funcionalidade 2
-Caso seja enviada uma query params (q) deve ser retornado o resultado da busca de produtos por nome.
-```typescript
-// Request
-// query params = q
-// GET /products?q=gamer
+**Get all products funcionalidade 2**
 
-// Response
-// status 200 OK
+```http
+GET /products?q=gamer
+```
+
+```json
 [
     {
-        id: "prod001",
-        name: "Mouse gamer",
-        price: 250,
-        description: "Melhor mouse do mercado!",
-        imageUrl: "https://picsum.photos/seed/Mouse%20gamer/400"
+        "id": "prod001",
+        "name": "Mouse gamer",
+        "price": 250,
+        "description": "Melhor mouse do mercado!",
+        "imageUrl": "https://picsum.photos/seed/Mouse%20gamer/400"
     },
     {
-        id: "prod003",
-        name: "Teclado gamer",
-        price: 200,
-        description: "Teclado mecânico com numpad",
-        imageUrl: "https://picsum.photos/seed/Teclado%20gamer/400"
+        "id": "prod003",
+        "name": "Teclado gamer",
+        "price": 200,
+        "description": "Teclado mecânico com numpad",
+        "imageUrl": "https://picsum.photos/seed/Teclado%20gamer/400"
     }
 ]
 ```
 
-## Edit product by id
-Edita um produto existente.
-```typescript
-// Request
-// path params = :id
+**Edit product by id**
 
-// PUT /products/prod003
-// body JSON
+```http
+PUT /products/prod003
+```
+
+```json
 {
     "id": "prod0033",
     "name": "Teclado gamer RGB",
@@ -182,20 +159,15 @@ Edita um produto existente.
     "description": "Teclado mecânico com RGB e numpad",
     "imageUrl": "https://picsum.photos/seed/Teclado%20gamer%20RGB/400"
 }
-
-// Response
-// status 200 OK
-{
-    message: "Produto atualizado com sucesso"
-}
 ```
 
-## Create purchase
-Cadastra um novo pedido.
-```typescript
-// Request
-// POST /purchases
-// body JSON
+**Create purchase**
+
+```http
+POST /purchases
+```
+
+```json
 {
     "id": "pur001",
     "buyer": "u001",
@@ -219,62 +191,69 @@ Cadastra um novo pedido.
         }
     ]
 }
-
-// Response
-// status 201 CREATED
-{
-    message: "Pedido realizado com sucesso"
-}
 ```
 
-## Delete purchase by id
-Deleta um pedido existente.
-```typescript
-// Request
-// path params = :id
-// DELETE /purchases/pur002
+**Delete purchase by id**
 
-// Response
-// status 200 OK
-{
-    message: "Pedido cancelado com sucesso"
-}
+```http
+DELETE /purchases/pur002
 ```
 
-## Get purchase by id
-Retorna os dados de uma compra, incluindo a lista de produtos da mesma.
-```typescript
-// Request
-// path params = :id
-// GET /purchases/pur001
+**Get purchase by id**
 
-// Response
-// status 200 OK
+```http
+GET /purchases/pur001
+```
+
+```json
 {
-    purchaseId: "pur001",
-    buyerId: "u001",
-    buyerName: "Fulano",
-    buyerEmail: "fulano@email.com",
-    totalPrice: 1400,
-    createdAt: "2023-01-15 16:24:54",
-    paid: 0,
-    products: [
+    "purchaseId": "pur001",
+    "buyerId": "u001",
+    "buyerName": "Fulano",
+    "buyerEmail": "fulano@example.com",
+    "totalPrice": 1400,
+    "createdAt": "2023-01-15 16:24:54",
+    "paid": 0,
+    "products": [
         {
-            id: "prod001",
-            name: "Mouse gamer",
-            price: 250,
-            description: "Melhor mouse do mercado!",
-            imageUrl: "https://picsum.photos/seed/Mouse%20gamer/400",
-            quantity: 2
+            "id": "prod001",
+            "name": "Mouse gamer",
+            "price": 250,
+            "description": "Melhor mouse do mercado!",
+            "imageUrl": "https://picsum.photos/seed/Mouse%20gamer/400",
+            "quantity": 2
         },
         {
-            id: "prod002",
-            name: "Monitor",
-            price: 900,
-            description: "Monitor LED Full HD 24 polegadas",
-            imageUrl: "https://picsum.photos/seed/Monitor/400",
-            quantity: 1
+            "id": "prod002",
+            "name": "Monitor",
+            "price": 900,
+            "description": "Monitor LED Full HD 24 polegadas",
+            "imageUrl": "https://picsum.photos/seed/Monitor/400",
+            "quantity": 1
         }
     ]
 }
 ```
+
+## Como executar o projeto
+
+1. Faça o clone do repositório.
+2. Instale as dependências do projeto com o comando `npm install`.
+3. Execute o comando `npm run dev` para iniciar o servidor de desenvolvimento.
+4. O servidor estará disponível em `http://localhost:3003`.
+5. Utilize o Postman ou qualquer outra ferramenta de API para fazer as requisições aos endpoints descritos acima.
+
+## Banco de Dados
+
+O projeto utiliza o banco de dados SQL SQLite. A estrutura do banco de dados pode ser visualizada no seguinte [link](https://dbdiagram.io/d/63c6e8e5296d97641d7a4666).
+
+## Observações
+
+- Ao realizar as requisições, verifique a estrutura dos dados e respeite os nomes das tabelas, colunas e propriedades retornadas pela API.
+- Para o endpoint de busca de produtos por nome, utilize o parâmetro de consulta `q` na URL.
+- Adicionar colunas extras na tabela não é um problema, mas a falta de uma coluna ou propriedade na resposta será considerada uma falha de implementação.
+
+Não é necessário cadastrar os mesmos nomes, e-mails ou outros valores vistos nos exemplos de saída, mas certifique-se de seguir a estrutura exigida pelo banco de dados e os nomes das propriedades na resposta da API.
+
+Turma: Barbosa C, Noturno.
+Aluno: Célio Cleiton Do Vale Rodrigues.
