@@ -28,6 +28,8 @@ O Projeto LabEcommerce é o primeiro projeto do curso de back-end, onde praticam
 
 ### Documentação Postman
 
+Documentação Postman [link](https://documenter.getpostman.com/view/24823231/2s93kxcmD6).
+
 O arquivo de documentação do Postman deve conter os exemplos de requisição e resposta para cada endpoint.
 
 ## Exemplos de requisição
