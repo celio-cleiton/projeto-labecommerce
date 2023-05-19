@@ -86,6 +86,7 @@ POST /products
     "name": "Teclado gamer",
     "price": 200,
     "description": "Teclado mecânico com numpad",
+    "category": "eletronico",
     "imageUrl": "https://picsum.photos/seed/Teclado%20gamer/400"
 }
 ```
@@ -103,6 +104,7 @@ GET /products
         "name": "Mouse gamer",
         "price": 250,
         "description": "Melhor mouse do mercado!",
+        "category": "eletronico",
         "imageUrl": "https://picsum.photos/seed/Mouse%20gamer/400"
     },
     {
@@ -110,6 +112,7 @@ GET /products
         "name": "Monitor",
         "price": 900,
         "description": "Monitor LED Full HD 24 polegadas",
+        "category": "eletronico",
         "imageUrl": "https://picsum.photos/seed/Monitor/400"
     },
     {
@@ -117,6 +120,7 @@ GET /products
         "name": "Teclado gamer",
         "price": 200,
         "description": "Teclado mecânico com numpad",
+        "category": "eletronico",
         "imageUrl": "https://picsum.photos/seed/Teclado%20gamer/400"
     }
 ]
@@ -125,24 +129,26 @@ GET /products
 **Get all products funcionalidade 2**
 
 ```http
-GET /products?q=gamer
+GET /product/search?q=tv
 ```
 
 ```json
 [
     {
-        "id": "prod001",
-        "name": "Mouse gamer",
-        "price": 250,
-        "description": "Melhor mouse do mercado!",
-        "imageUrl": "https://picsum.photos/seed/Mouse%20gamer/400"
+        "id": "p001",
+        "name": "tv",
+        "price": 5800,
+        "description": "Melhor do mercado!",
+        "category": "eletronico",
+        "imageUrl": "https://picsum.photos/seed/tv%20gamer/400"
     },
     {
-        "id": "prod003",
-        "name": "Teclado gamer",
-        "price": 200,
-        "description": "Teclado mecânico com numpad",
-        "imageUrl": "https://picsum.photos/seed/Teclado%20gamer/400"
+        "id": "p002",
+        "name": "SmatTV",
+        "price": 4500,
+        "description": "Smart TV com Teclado mecânico com numpad",
+        "category": "eletronico",
+        "imageUrl": "https://picsum.photos/seed/tv%20gamer/400"
     }
 ]
 ```
@@ -158,8 +164,6 @@ PUT /products/prod003
     "id": "prod0033",
     "name": "Teclado gamer RGB",
     "price": 300,
-    "description": "Teclado mecânico com RGB e numpad",
-    "imageUrl": "https://picsum.photos/seed/Teclado%20gamer%20RGB/400"
 }
 ```
 
@@ -171,28 +175,31 @@ POST /purchases
 
 ```json
 {
-    "id": "pur001",
-    "buyer": "u001",
-    "totalPrice": 1400,
-    "products": [
-        {
-            "id": "prod001",
-            "name": "Mouse gamer",
-            "price": 250,
-            "description": "Melhor mouse do mercado!",
-            "imageUrl": "https://picsum.photos/seed/Mouse%20gamer/400",
-            "quantity": 2
-        },
-        {
-            "id": "prod002",
-            "name": "Monitor",
-            "price": 900,
-            "description": "Monitor LED Full HD 24 polegadas",
-            "imageUrl": "https://picsum.photos/seed/Monitor/400",
-            "quantity": 1
-        }
-    ]
+  "id": "c009",
+  "buyer": "u003",
+  "totalPrice": 14800,
+  "products": [
+    {
+      "id": "p001",
+        "name": "tv",
+        "price": 5800,
+        "description": "descrição",
+        "category": "eletronico",
+        "imageUrl": "tv.png",
+      "quantity": 1
+    },
+    {
+      "id": "p002",
+        "name": "smartTv",
+        "price": 4500,
+        "description": "descrição",
+        "category": "eletronico",
+        "imageUrl": "smartTv.png",
+      "quantity": 2
+    }
+  ]
 }
+
 ```
 
 **Delete purchase by id**
@@ -204,34 +211,21 @@ DELETE /purchases/pur002
 **Get purchase by id**
 
 ```http
-GET /purchases/pur001
+GET /purchases/:id
 ```
 
 ```json
 {
-    "purchaseId": "pur001",
-    "buyerId": "u001",
-    "buyerName": "Fulano",
-    "buyerEmail": "fulano@example.com",
-    "totalPrice": 1400,
-    "createdAt": "2023-01-15 16:24:54",
+    "id": "c002",
+    "buyer": "u002",
+    "total_price": 5600,
+    "created_at": "2023-05-18 21:26:44",
     "paid": 0,
     "products": [
         {
-            "id": "prod001",
-            "name": "Mouse gamer",
-            "price": 250,
-            "description": "Melhor mouse do mercado!",
-            "imageUrl": "https://picsum.photos/seed/Mouse%20gamer/400",
-            "quantity": 2
-        },
-        {
-            "id": "prod002",
-            "name": "Monitor",
-            "price": 900,
-            "description": "Monitor LED Full HD 24 polegadas",
-            "imageUrl": "https://picsum.photos/seed/Monitor/400",
-            "quantity": 1
+            "id": "p002",
+            "name": "smartTv",
+            "price": 4500
         }
     ]
 }

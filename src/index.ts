@@ -78,8 +78,8 @@ app.post('/users', async (req: Request, res: Response) => {
 app.post('/products', async (req: Request, res: Response) => {
   try {
     const id: string = Math.floor(Date.now() * Math.random()).toString(36);
-    const { name, price, description, imageUrl } = req.body;
-    if (typeof name !== "string" || typeof price !== "number" || typeof description !== "string" || typeof imageUrl !== "string") {
+    const { name, price, description, category, imageUrl } = req.body;
+    if (typeof name !== "string" || typeof price !== "number" || typeof description !== "string" || typeof category !== "string" || typeof imageUrl !== "string") {
       res.status(400);
       throw new Error("'id', 'nome', 'description' devem ser do tipo string e 'price' do tipo number");
     }
@@ -88,7 +88,7 @@ app.post('/products', async (req: Request, res: Response) => {
       res.status(400);
       throw new Error("Este ID já possui um produto");
     }
-    await db.raw(`INSERT INTO products (id, name, price, description, imageUrl) VALUES ("${id}", "${name}", ${price}, "${description}", "${imageUrl}")`);
+    await db.raw(`INSERT INTO products (id, name, price, description, category, imageUrl) VALUES ("${id}", "${name}", ${price}, "${description}", "${category}", "${imageUrl}")`);
     res.status(201).send("Produto cadastrado com sucesso");
   } catch (error: any) {
     res.send(error.message);
@@ -117,76 +117,130 @@ app.get('/product/search', async (req: Request, res: Response) => {
 app.put('/products/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, price, description, imageUrl, category } = req.body;
+    const { name, price } = req.body; // Alterado para incluir apenas id, nome e preço
+
     // Verifica se o produto existe no banco de dados
     const productExists = await db.raw(`SELECT * FROM products WHERE id = "${id}";`);
     if (!productExists) {
       throw new Error("Produto não encontrado");
     }
+
     // Atualiza o produto no banco de dados
     await db.raw(`
       UPDATE products 
       SET 
-        id =  COALESCE("${id}", id),  
+        id = COALESCE("${id}", id),  
         name = COALESCE("${name}", name),
-        price = COALESCE(${price}, price),
-        description = COALESCE("${description}", description),
-        imageUrl = COALESCE("${imageUrl}", imageUrl),
-        category = COALESCE("${category}", category)
+        price = COALESCE(${price}, price)
       WHERE id = "${id}"
     `);
-    // Obtém o produto atualizado do banco de dados
-    const updatedProduct = await db.raw(`SELECT * FROM products WHERE id = "${id}";`);
 
-    res.status(200).send(updatedProduct);
+    // Obtém o produto atualizado do banco de dados
+    const updatedProduct = await db.raw(`SELECT id, name, price FROM products WHERE id = "${id}";`);
+
+    res.status(200).send({
+      message: "Produto atualizado com sucesso!",
+      product: updatedProduct,
+    });
   } catch (error: any) {
     res.status(400).send(error.message);
   }
 });
 //criar compras.
-app.post('/purchases', async (req: Request, res: Response) => {
+app.post("/purchases", async (req: Request, res: Response) => {
   try {
-    const id: string = Math.floor(Date.now() * Math.random()).toString(36);
-    const { buyer, total_price } = req.body;
-    if (typeof buyer !== "string" || typeof total_price !== "number") {
-      res.status(400);
-      throw new Error("Passe um ID de usuário ou valor total de compra válidos");
+    const { id, buyer, totalPrice, products } = req.body;
+
+    if (!id || !buyer || !totalPrice || !products) {
+      throw new Error("Dados inválidos.");
     }
-    const [userExists] = await db.raw(`SELECT * FROM users WHERE id = "${buyer}";`);
-    if (!userExists) {
-      throw new Error("Usuário não encontrado");
+
+    await db.transaction(async (trx) => {
+      await trx.raw(`
+        INSERT INTO purchases(id, buyer, total_price)
+        VALUES(?, ?, ?);
+      `, [id, buyer, totalPrice]);
+
+      for (const product of products) {
+        await trx.raw(`
+          INSERT INTO purchases_products(purchase_id, product_id, quantity)
+          VALUES(?, ?, ?);
+        `, [id, product.id, product.quantity]);
+      }
+    });
+
+    res.status(201).send({ message: "Pedido realizado com sucesso" });
+  } catch (err) {
+    console.log(err);
+    if (res.statusCode === 200) {
+      res.status(500);
     }
-    await db.raw(`INSERT INTO purchases (id, buyer, total_price) VALUES ("${id}", "${buyer}", ${total_price})`);
-    res.status(201).send("Compra cadastrada com sucesso");
-  } catch (error: any) {
-    res.send(error.message);
+
+    if (err instanceof Error) {
+      res.send(err.message);
+    } else {
+      res.send("Erro inesperado");
+    }
   }
 });
+
 //deletar compras por id.
 app.delete('/purchases/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const purchaseExists = await db.raw(`SELECT * FROM purchases WHERE id = "${id}";`);
-    if (!purchaseExists) {
+    const purchaseExists = await db.raw(`SELECT * FROM purchases WHERE id = ?;`, [id]);
+
+    if (purchaseExists.length === 0) {
       throw new Error("Compra não encontrada");
     }
-    await db.raw(`DELETE FROM purchases WHERE id = "${id}";`);
+
+    await db.transaction(async (trx) => {
+      await trx.raw(`DELETE FROM purchases_products WHERE purchase_id = ?;`, [id]);
+      await trx.raw(`DELETE FROM purchases WHERE id = ?;`, [id]);
+    });
+
     res.status(200).send("Pedido cancelado com sucesso");
   } catch (error: any) {
-    res.send(error.message);
+    res.status(400).send(error.message);
   }
 });
+
 //pegar compra por id
 app.get('/purchases/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const purchase = await db.raw(`SELECT * FROM purchases WHERE id = "${id}";`);
+
+    const purchase = await db.raw(`
+      SELECT purchases.id, purchases.buyer, purchases.total_price, purchases.created_at, purchases.paid,
+        products.id AS product_id, products.name AS product_name, products.price AS product_price
+      FROM purchases
+      INNER JOIN purchases_products ON purchases.id = purchases_products.purchase_id
+      INNER JOIN products ON purchases_products.product_id = products.id
+      WHERE purchases.id = "${id}";
+    `);
 
     if (purchase.length === 0) {
       throw new Error("Compra não encontrada");
     }
 
-    res.status(200).send(purchase[0]);
+    // Extrair as informações da compra e dos produtos
+    const { id: purchaseId, buyer, total_price: totalPrice, created_at: createdAt, paid } = purchase[0];
+    const products = purchase.map((row: any) => ({
+      id: row.product_id,
+      name: row.product_name,
+      price: row.product_price,
+    }));
+
+    const purchaseData = {
+      id: purchaseId,
+      buyer,
+      total_price: totalPrice,
+      created_at: createdAt,
+      paid,
+      products,
+    };
+
+    res.status(200).send(purchaseData);
   } catch (error: any) {
     res.status(400).send(error.message);
   }
