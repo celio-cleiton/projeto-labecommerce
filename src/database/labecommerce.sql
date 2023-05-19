@@ -72,44 +72,44 @@ INSERT INTO
         id,
         name,
         price,
-        category,
         description,
+        category,
         imageUrl
     )
 VALUES (
         "p001",
         "tv",
         5800,
-        "eletronico",
         "descrição",
+        "eletronico",
         "tv.png"
     ), (
         "p002",
         "smartTv",
         4500,
-        "eletronico",
         "descrição",
+        "eletronico",
         "smartTv.png"
     ), (
         "p003",
         "smartPhone",
         1000,
-        "eletronico",
         "descrição",
+        "eletronico",
         "smartPhone.png"
     ), (
         "p004",
         "monitor",
         1400,
-        "eletronico",
         "descrição",
+        "eletronico",
         "monitor.png"
     ), (
         "p005",
         "gabinete",
         200,
-        "eletronico",
         "descrição",
+        "eletronico",
         "gabinete.png"
     );
 
@@ -121,7 +121,7 @@ VALUES
 
 INSERT INTO products (id, name, price, category, description, imageUrl)
 VALUES
-("p006", "iphone", 7500, "eletronico","descrição", "iphone.png");
+("p006", "iphone", 7500, "descrição", "eletronico", "iphone.png");
 
 INSERT INTO purchases (id, buyer, total_price)
 VALUES
@@ -134,7 +134,7 @@ SELECT * FROM purchases;
 SELECT * FROM users
 INNER JOIN purchases
 ON users.id=purchases.buyer
-WHERE users.id="u002";
+WHERE users.id="u003";
 INSERT INTO purchases_products(purchase_id, product_id, quantity)
 VALUES
 ('c001','p003',3),
